@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>これ〜んゲーム</title>
+  <title>これ〜んげ〜む</title>
 
   <style>
     * { box-sizing: border-box; }
@@ -14,6 +14,52 @@
       background: linear-gradient(180deg, #ffe8f4, #fff8fc);
       color: #6b3b55;
       text-align: center;
+      min-height: 100vh;
+    }
+
+    .titleScreen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 151, 197, .35), transparent 28%),
+        radial-gradient(circle at 80% 30%, rgba(184, 231, 255, .45), transparent 28%),
+        linear-gradient(180deg, #ffe8f4, #fff8fc);
+    }
+
+    .titleLogo {
+      font-size: 44px;
+      color: #ff69a8;
+      text-shadow: 3px 3px 0 #fff;
+      letter-spacing: .08em;
+      animation: popTitle .65s ease both;
+      margin-bottom: 24px;
+    }
+
+    @keyframes popTitle {
+      0% {
+        opacity: 0;
+        transform: scale(.65) translateY(18px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.12) translateY(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .startGameBtn {
+      font-size: 18px;
+      padding: 15px 42px;
+    }
+
+    .gameScreen {
+      display: none;
     }
 
     .wrap {
@@ -81,7 +127,7 @@
       left: 160px;
       width: 66px;
       z-index: 8;
-      transition: top .75s ease, left .75s ease;
+      transition: top .75s ease, left .18s ease;
     }
 
     .rope {
@@ -157,7 +203,6 @@
       transition:
         left .7s ease,
         top .7s ease,
-        bottom .7s ease,
         transform .4s ease,
         opacity .4s ease;
       user-select: none;
@@ -185,16 +230,20 @@
 
     .controls {
       margin-top: 16px;
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
       gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .catchControl {
+      margin-top: 10px;
     }
 
     button {
       border: none;
       border-radius: 999px;
-      padding: 13px 22px;
+      padding: 13px 18px;
       font-size: 15px;
       font-weight: bold;
       background: #ff7db8;
@@ -214,18 +263,18 @@
       cursor: not-allowed;
     }
 
+    .moveBtn {
+      background: #ff9bcc;
+      box-shadow: 0 5px 0 #d86aa3;
+      font-size: 18px;
+    }
+
     .message {
       margin-top: 14px;
       min-height: 30px;
       font-weight: bold;
       font-size: 17px;
       color: #ff5fa2;
-    }
-
-    .notice {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #9b6680;
     }
 
     .otomeOverlay {
@@ -302,38 +351,45 @@
 </head>
 
 <body>
-  <div class="wrap">
-    <h1>これ〜んゲーム</h1>
-    <p class="sub">かわいい景品をGETしよう♡<br>※特別な演出が発生する場合があります</p>
+  <div class="titleScreen" id="titleScreen">
+    <div class="titleLogo">これ〜んげ〜む</div>
+    <button class="startGameBtn" id="titleStartBtn">START</button>
+  </div>
 
-    <div class="game">
-      <div class="machine-top">KORE〜N GAME</div>
+  <div class="gameScreen" id="gameScreen">
+    <div class="wrap">
+      <h1>これ〜んゲーム</h1>
+      <p class="sub">かわいい景品をGETしよう♡<br>※特別な演出が発生する場合があります</p>
 
-      <div class="sparkle s1">✦</div>
-      <div class="sparkle s2">♡</div>
-      <div class="sparkle s3">✧</div>
+      <div class="game">
+        <div class="machine-top">KOREEN GAME</div>
 
-      <div class="claw" id="claw">
-        <div class="rope"></div>
-        <div class="clawHead">
-          <div class="clawJoint"></div>
-          <div class="clawArm left"></div>
-          <div class="clawArm right"></div>
+        <div class="sparkle s1">✦</div>
+        <div class="sparkle s2">♡</div>
+        <div class="sparkle s3">✧</div>
+
+        <div class="claw" id="claw">
+          <div class="rope"></div>
+          <div class="clawHead">
+            <div class="clawJoint"></div>
+            <div class="clawArm left"></div>
+            <div class="clawArm right"></div>
+          </div>
         </div>
+
+        <div class="prizeArea" id="prizeArea"></div>
+
+        <div class="floor"></div>
       </div>
 
-      <div class="prizeArea" id="prizeArea"></div>
+      <div class="controls">
+        <button class="moveBtn" id="leftBtn">←</button>
+        <button id="catchBtn">ここで取る！</button>
+        <button class="moveBtn" id="rightBtn">→</button>
+      </div>
 
-      <div class="floor"></div>
+      <div class="message" id="message"></div>
     </div>
-
-    <div class="controls">
-      <button id="startBtn">スタート</button>
-      <button id="catchBtn" disabled>ここで取る！</button>
-    </div>
-
-    <div class="message" id="message">スタートを押してね♡</div>
-    <div class="notice">画像はあとで差し替えOKです</div>
   </div>
 
   <div class="otomeOverlay" id="otomeOverlay">
@@ -349,9 +405,14 @@
   </div>
 
   <script>
+    const titleScreen = document.getElementById("titleScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const titleStartBtn = document.getElementById("titleStartBtn");
+
     const claw = document.getElementById("claw");
     const prizeArea = document.getElementById("prizeArea");
-    const startBtn = document.getElementById("startBtn");
+    const leftBtn = document.getElementById("leftBtn");
+    const rightBtn = document.getElementById("rightBtn");
     const catchBtn = document.getElementById("catchBtn");
     const message = document.getElementById("message");
 
@@ -366,9 +427,7 @@
     ];
 
     let clawX = 160;
-    let direction = 1;
-    let moving = false;
-    let timer = null;
+    let isPlaying = false;
     let nextPlayGuaranteed = false;
     let currentTargetPrize = null;
 
@@ -418,36 +477,35 @@
       });
     }
 
-    function resetGame() {
+    function resetClaw() {
       clawX = 160;
-      direction = 1;
-      moving = false;
       currentTargetPrize = null;
-
       claw.classList.remove("grabbing");
       claw.style.left = clawX + "px";
       claw.style.top = "72px";
-
-      makePrizeField();
-
-      message.textContent = nextPlayGuaranteed
-        ? "次は特別チャンス♡"
-        : "クレーンが動くよ♡";
+      message.textContent = nextPlayGuaranteed ? "次回確定GETチャンス♡" : "";
     }
 
-    function moveClaw() {
-      clawX += direction * 4;
+    function setButtonsDisabled(disabled) {
+      leftBtn.disabled = disabled;
+      rightBtn.disabled = disabled;
+      catchBtn.disabled = disabled;
+    }
 
-      if (clawX > 310) direction = -1;
-      if (clawX < 10) direction = 1;
+    function moveClaw(amount) {
+      if (isPlaying) return;
+
+      clawX += amount;
+      if (clawX < 10) clawX = 10;
+      if (clawX > 310) clawX = 310;
 
       claw.style.left = clawX + "px";
     }
 
-    function findNearestPrize() {
+    function findTargetPrize() {
       const items = [...document.querySelectorAll(".prizeItem")];
 
-      let nearest = null;
+      let target = null;
       let nearestDistance = Infinity;
 
       items.forEach(item => {
@@ -457,54 +515,42 @@
 
         if (distance < nearestDistance) {
           nearestDistance = distance;
-          nearest = item;
+          target = item;
         }
       });
 
       return {
-        prize: nearest,
+        prize: target,
         distance: nearestDistance
       };
     }
 
-    startBtn.addEventListener("click", () => {
-      resetGame();
+    function playCatch() {
+      if (isPlaying) return;
 
-      moving = true;
-      startBtn.disabled = true;
-      catchBtn.disabled = false;
+      isPlaying = true;
+      setButtonsDisabled(true);
+      message.textContent = "";
 
-      timer = setInterval(moveClaw, 25);
-    });
-
-    catchBtn.addEventListener("click", () => {
-      if (!moving) return;
-
-      moving = false;
-      clearInterval(timer);
-
-      catchBtn.disabled = true;
-      message.textContent = "アーム下降中...";
-
-      const result = findNearestPrize();
+      const result = findTargetPrize();
       currentTargetPrize = result.prize;
 
       claw.style.top = "245px";
 
       setTimeout(() => {
         claw.classList.add("grabbing");
-        message.textContent = "つかんだかも...！";
       }, 700);
 
-      setTimeout(judgeCatch, 1250);
-    });
+      setTimeout(() => {
+        judgeCatch(result.distance);
+      }, 1200);
+    }
 
-    function judgeCatch() {
-      const result = findNearestPrize();
-      const isGoodPosition = result.distance < 68;
+    function judgeCatch(distance) {
+      const isGoodPosition = distance < 68;
 
-      if (!currentTargetPrize) {
-        failCatch();
+      if (!currentTargetPrize || !isGoodPosition) {
+        missPrize();
         return;
       }
 
@@ -516,12 +562,10 @@
 
       const isLucky = Math.random() < normalSuccessRate;
 
-      if (isGoodPosition && isLucky) {
-        liftPrize(true, "GET！景品を取れたよ♡");
-      } else if (isGoodPosition) {
-        liftPrize(false, "あっ、落ちちゃった...！");
+      if (isLucky) {
+        liftPrize(true, "GET♡");
       } else {
-        missPrize();
+        liftPrize(false, "");
       }
     }
 
@@ -532,43 +576,40 @@
       currentTargetPrize.style.left = clawLeft + "px";
       currentTargetPrize.style.top = "150px";
 
-      message.textContent = "持ち上げ中...！";
-
       setTimeout(() => {
         claw.style.top = "72px";
         currentTargetPrize.style.top = "35px";
-      }, 500);
+      }, 450);
 
       if (success) {
         setTimeout(() => {
           message.textContent = text;
           currentTargetPrize.style.transform = "scale(1.18)";
-          startBtn.disabled = false;
-        }, 1300);
+          finishPlay();
+        }, 1250);
       } else {
         setTimeout(() => {
           currentTargetPrize.classList.add("drop");
           currentTargetPrize.style.top = currentTargetPrize.dataset.baseTop + "px";
           currentTargetPrize.style.left = currentTargetPrize.dataset.baseLeft + "px";
-          message.textContent = text;
-        }, 1300);
+        }, 1200);
 
         setTimeout(() => {
           claw.classList.remove("grabbing");
           failCatch();
-        }, 1900);
+        }, 1750);
       }
     }
 
     function missPrize() {
-      message.textContent = "空振りしちゃった...！";
-
       setTimeout(() => {
         claw.classList.remove("grabbing");
         claw.style.top = "72px";
-      }, 700);
+      }, 600);
 
-      setTimeout(failCatch, 1200);
+      setTimeout(() => {
+        failCatch();
+      }, 1000);
     }
 
     function failCatch() {
@@ -578,14 +619,16 @@
         nextPlayGuaranteed = true;
         showSpecialMessage();
       } else {
-        message.textContent = "惜しい！もう一回チャレンジ♡";
-
-        setTimeout(() => {
-          claw.classList.remove("grabbing");
-          claw.style.top = "72px";
-          startBtn.disabled = false;
-        }, 900);
+        message.textContent = "惜しい！";
+        finishPlay();
       }
+    }
+
+    function finishPlay() {
+      isPlaying = false;
+      setButtonsDisabled(false);
+      claw.classList.remove("grabbing");
+      claw.style.top = "72px";
     }
 
     function showSpecialMessage() {
@@ -598,15 +641,28 @@
       otomeOverlay.style.display = "flex";
     }
 
-    closeEventBtn.addEventListener("click", () => {
-      otomeOverlay.style.display = "none";
-      message.textContent = "次回は確定GETチャンス♡";
-      claw.classList.remove("grabbing");
-      claw.style.top = "72px";
-      startBtn.disabled = false;
+    titleStartBtn.addEventListener("click", () => {
+      titleScreen.style.display = "none";
+      gameScreen.style.display = "block";
+      makePrizeField();
+      resetClaw();
     });
 
-    makePrizeField();
+    leftBtn.addEventListener("click", () => {
+      moveClaw(-28);
+    });
+
+    rightBtn.addEventListener("click", () => {
+      moveClaw(28);
+    });
+
+    catchBtn.addEventListener("click", playCatch);
+
+    closeEventBtn.addEventListener("click", () => {
+      otomeOverlay.style.display = "none";
+      message.textContent = "次回確定GETチャンス♡";
+      finishPlay();
+    });
   </script>
 </body>
 </html>
