@@ -114,6 +114,13 @@
       transition: bottom .75s ease, transform .3s ease;
     }
 
+    .prize img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
     .floor {
       position: absolute;
       bottom: 0;
@@ -258,7 +265,10 @@
         <div class="arm">⌒⌒</div>
       </div>
 
-      <div class="prize" id="prize">🎁</div>
+      <div class="prize" id="prize">
+        <img id="prizeImg" src="IMG_9260.png" alt="景品">
+      </div>
+
       <div class="floor"></div>
     </div>
 
@@ -286,6 +296,7 @@
   <script>
     const claw = document.getElementById("claw");
     const prize = document.getElementById("prize");
+    const prizeImg = document.getElementById("prizeImg");
     const startBtn = document.getElementById("startBtn");
     const catchBtn = document.getElementById("catchBtn");
     const message = document.getElementById("message");
@@ -294,6 +305,11 @@
     const characterName = document.getElementById("characterName");
     const characterSerif = document.getElementById("characterSerif");
     const closeEventBtn = document.getElementById("closeEventBtn");
+
+    const prizes = [
+      "IMG_9260.png",
+      "IMG_9263.png"
+    ];
 
     let clawX = 160;
     let direction = 1;
@@ -324,6 +340,9 @@
     ];
 
     function resetGame() {
+      const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
+      prizeImg.src = randomPrize;
+
       clawX = 160;
       direction = 1;
       moving = false;
