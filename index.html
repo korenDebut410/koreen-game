@@ -26,7 +26,7 @@
       padding: 24px;
       background:
         radial-gradient(circle at 20% 20%, rgba(255, 151, 197, .35), transparent 28%),
-        radial-gradient(circle at 80% 30%, rgba(184, 231, 255, .45), transparent 28%),
+        radial-gradient(circle at 80% 30%, rgba(255, 187, 122, .42), transparent 28%),
         linear-gradient(180deg, #ffe8f4, #fff8fc);
     }
 
@@ -40,17 +40,9 @@
     }
 
     @keyframes popTitle {
-      0% {
-        opacity: 0;
-        transform: scale(.65) translateY(18px);
-      }
-      70% {
-        opacity: 1;
-        transform: scale(1.12) translateY(0);
-      }
-      100% {
-        transform: scale(1);
-      }
+      0% { opacity: 0; transform: scale(.65) translateY(18px); }
+      70% { opacity: 1; transform: scale(1.12) translateY(0); }
+      100% { transform: scale(1); }
     }
 
     .startGameBtn {
@@ -60,65 +52,131 @@
 
     .gameScreen {
       display: none;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,255,255,.45), transparent 18%),
+        radial-gradient(circle at 85% 20%, rgba(255,255,255,.35), transparent 20%),
+        linear-gradient(135deg, #ff8fc6, #ffb16c, #ffd1df, #ff8fc6);
+      background-size: 220% 220%;
+      animation: waveGradient 9s ease-in-out infinite;
+    }
+
+    .gameScreen::before,
+    .gameScreen::after {
+      content: "";
+      position: fixed;
+      left: -20%;
+      width: 140%;
+      height: 180px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .gameScreen::before {
+      top: 130px;
+      background: rgba(255,255,255,.18);
+      transform: rotate(-6deg);
+      animation: waveMove 7s ease-in-out infinite alternate;
+    }
+
+    .gameScreen::after {
+      top: 260px;
+      background: rgba(255,230,170,.22);
+      transform: rotate(5deg);
+      animation: waveMove 9s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes waveGradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes waveMove {
+      from { transform: translateX(-24px) rotate(-6deg); }
+      to { transform: translateX(24px) rotate(6deg); }
     }
 
     .wrap {
       max-width: 430px;
       margin: 0 auto;
       padding: 18px 14px 28px;
+      position: relative;
+      z-index: 2;
     }
 
     h1 {
       margin: 8px 0 6px;
       font-size: 34px;
-      color: #ff69a8;
-      text-shadow: 2px 2px 0 #fff;
+      color: #fff;
+      text-shadow:
+        0 3px 0 #ff7db8,
+        0 0 12px rgba(255,255,255,.85);
       letter-spacing: 0.05em;
     }
 
     .sub {
       margin: 0 0 12px;
       font-size: 14px;
-      color: #9b6680;
+      color: #fff;
+      text-shadow: 0 2px 6px rgba(180, 80, 120, .35);
+      font-weight: bold;
     }
 
     .game {
       position: relative;
       width: 100%;
       height: 520px;
-      background: linear-gradient(#fff, #fff7fb);
-      border: 7px solid #ffb6d5;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.9), transparent 22%),
+        linear-gradient(#fff, #fff7fb);
+      border: 7px solid rgba(255, 255, 255, .85);
+      outline: 5px solid #ff9ccc;
       border-radius: 28px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(255, 120, 170, 0.25);
+      box-shadow:
+        0 10px 25px rgba(255, 120, 170, 0.25),
+        0 0 28px rgba(255,255,255,.65);
     }
 
     .machine-top {
       height: 72px;
-      background: #ffd8e9;
+      background: linear-gradient(90deg, #ffd1e6, #ffe0b8, #ffd1e6);
       border-bottom: 4px solid #ffadd1;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
       color: #ff5fa2;
+      letter-spacing: .08em;
     }
 
     .sparkle {
       position: absolute;
       font-size: 18px;
-      opacity: 0.8;
+      opacity: 0.85;
       animation: blink 1.6s infinite alternate;
       z-index: 1;
+      color: #87506c;
+      text-shadow: 0 0 10px #fff;
+      pointer-events: none;
     }
 
     .s1 { top: 95px; left: 24px; }
     .s2 { top: 155px; right: 30px; animation-delay: .5s; }
     .s3 { bottom: 120px; left: 34px; animation-delay: .9s; }
+    .s4 { top: 110px; right: 90px; animation-delay: .2s; }
+    .s5 { top: 235px; left: 70px; animation-delay: .8s; }
+    .s6 { bottom: 170px; right: 70px; animation-delay: 1.1s; }
+    .s7 { top: 300px; right: 28px; animation-delay: .4s; }
+    .s8 { bottom: 84px; left: 180px; animation-delay: 1.3s; }
 
     @keyframes blink {
-      from { opacity: .25; transform: scale(.9); }
-      to { opacity: 1; transform: scale(1.15); }
+      from { opacity: .25; transform: scale(.85) rotate(-8deg); }
+      to { opacity: 1; transform: scale(1.22) rotate(8deg); }
     }
 
     .claw {
@@ -201,7 +259,6 @@
       height: 86px;
       object-fit: contain;
       transition:
-        left .7s ease,
         top .7s ease,
         transform .4s ease,
         opacity .4s ease;
@@ -211,11 +268,11 @@
 
     .prizeItem.caught {
       z-index: 7;
-      transform: scale(1.08);
+      transform: translateY(-24px) scale(1.08);
     }
 
     .prizeItem.drop {
-      transform: rotate(18deg) scale(.95);
+      transform: translateY(0) rotate(18deg) scale(.95);
     }
 
     .floor {
@@ -223,7 +280,7 @@
       bottom: 0;
       width: 100%;
       height: 60px;
-      background: #ffe0ee;
+      background: linear-gradient(90deg, #ffe0ee, #ffe7c7, #ffe0ee);
       border-top: 4px dashed #ff95c5;
       z-index: 2;
     }
@@ -234,10 +291,6 @@
       grid-template-columns: 1fr 1.2fr 1fr;
       gap: 10px;
       align-items: center;
-    }
-
-    .catchControl {
-      margin-top: 10px;
     }
 
     button {
@@ -274,7 +327,8 @@
       min-height: 30px;
       font-weight: bold;
       font-size: 17px;
-      color: #ff5fa2;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(180, 80, 120, .45);
     }
 
     .otomeOverlay {
@@ -367,6 +421,11 @@
         <div class="sparkle s1">✦</div>
         <div class="sparkle s2">♡</div>
         <div class="sparkle s3">✧</div>
+        <div class="sparkle s4">♡</div>
+        <div class="sparkle s5">✦</div>
+        <div class="sparkle s6">✧</div>
+        <div class="sparkle s7">♡</div>
+        <div class="sparkle s8">✦</div>
 
         <div class="claw" id="claw">
           <div class="rope"></div>
@@ -453,16 +512,29 @@
       }
     ];
 
+    function randomBetween(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffleArray(array) {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
+
     function makePrizeField() {
       prizeArea.innerHTML = "";
 
-      const positions = [
-        { left: 42, top: 160 },
-        { left: 150, top: 145 },
-        { left: 255, top: 165 },
-        { left: 92, top: 75 },
-        { left: 210, top: 70 }
+      const basePositions = [
+        { left: 35, top: 165 },
+        { left: 145, top: 150 },
+        { left: 250, top: 168 },
+        { left: 80, top: 82 },
+        { left: 205, top: 78 }
       ];
+
+      const positions = shuffleArray(basePositions).map(pos => ({
+        left: pos.left + randomBetween(-18, 18),
+        top: pos.top + randomBetween(-14, 14)
+      }));
 
       positions.forEach((pos, index) => {
         const img = document.createElement("img");
@@ -570,28 +642,26 @@
     }
 
     function liftPrize(success, text) {
-      const clawLeft = clawX + claw.offsetWidth / 2 - currentTargetPrize.offsetWidth / 2;
+      const originalTop = Number(currentTargetPrize.dataset.baseTop);
 
       currentTargetPrize.classList.add("caught");
-      currentTargetPrize.style.left = clawLeft + "px";
-      currentTargetPrize.style.top = "150px";
+      currentTargetPrize.style.top = (originalTop - 34) + "px";
 
       setTimeout(() => {
         claw.style.top = "72px";
-        currentTargetPrize.style.top = "35px";
+        currentTargetPrize.style.top = (originalTop - 118) + "px";
       }, 450);
 
       if (success) {
         setTimeout(() => {
           message.textContent = text;
-          currentTargetPrize.style.transform = "scale(1.18)";
+          currentTargetPrize.style.transform = "translateY(-24px) scale(1.18)";
           finishPlay();
         }, 1250);
       } else {
         setTimeout(() => {
           currentTargetPrize.classList.add("drop");
           currentTargetPrize.style.top = currentTargetPrize.dataset.baseTop + "px";
-          currentTargetPrize.style.left = currentTargetPrize.dataset.baseLeft + "px";
         }, 1200);
 
         setTimeout(() => {
