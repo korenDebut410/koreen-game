@@ -6,9 +6,7 @@
   <title>これ〜んゲーム</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -65,6 +63,7 @@
       font-size: 18px;
       opacity: 0.8;
       animation: blink 1.6s infinite alternate;
+      z-index: 1;
     }
 
     .s1 { top: 95px; left: 24px; }
@@ -80,9 +79,9 @@
       position: absolute;
       top: 72px;
       left: 160px;
-      width: 62px;
-      z-index: 5;
-      transition: top .75s ease;
+      width: 66px;
+      z-index: 8;
+      transition: top .75s ease, left .75s ease;
     }
 
     .rope {
@@ -93,32 +92,85 @@
       border-radius: 99px;
     }
 
-    .arm {
-      font-size: 44px;
-      line-height: 34px;
-      color: #8b5b72;
+    .clawHead {
+      position: relative;
+      width: 66px;
+      height: 56px;
+      margin: 0 auto;
     }
 
-    .prize {
+    .clawJoint {
       position: absolute;
-      bottom: 66px;
-      left: 150px;
-      width: 76px;
-      height: 76px;
-      background: #c8edff;
-      border: 4px solid #83cdf0;
-      border-radius: 22px;
-      font-size: 38px;
-      line-height: 68px;
+      top: 0;
+      left: 50%;
+      width: 18px;
+      height: 18px;
+      background: #8b5b72;
+      border-radius: 50%;
+      transform: translateX(-50%);
       z-index: 3;
-      transition: bottom .75s ease, transform .3s ease;
     }
 
-    .prize img {
-      width: 100%;
-      height: 100%;
+    .clawArm {
+      position: absolute;
+      top: 12px;
+      width: 8px;
+      height: 48px;
+      background: #8b5b72;
+      border-radius: 99px;
+      transform-origin: top center;
+      transition: transform .35s ease;
+    }
+
+    .clawArm.left {
+      left: 22px;
+      transform: rotate(38deg);
+    }
+
+    .clawArm.right {
+      right: 22px;
+      transform: rotate(-38deg);
+    }
+
+    .claw.grabbing .clawArm.left {
+      transform: rotate(10deg);
+    }
+
+    .claw.grabbing .clawArm.right {
+      transform: rotate(-10deg);
+    }
+
+    .prizeArea {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 70px;
+      height: 270px;
+      z-index: 3;
+    }
+
+    .prizeItem {
+      position: absolute;
+      width: 86px;
+      height: 86px;
       object-fit: contain;
-      display: block;
+      transition:
+        left .7s ease,
+        top .7s ease,
+        bottom .7s ease,
+        transform .4s ease,
+        opacity .4s ease;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .prizeItem.caught {
+      z-index: 7;
+      transform: scale(1.08);
+    }
+
+    .prizeItem.drop {
+      transform: rotate(18deg) scale(.95);
     }
 
     .floor {
@@ -128,6 +180,7 @@
       height: 60px;
       background: #ffe0ee;
       border-top: 4px dashed #ff95c5;
+      z-index: 2;
     }
 
     .controls {
@@ -262,12 +315,14 @@
 
       <div class="claw" id="claw">
         <div class="rope"></div>
-        <div class="arm">⌒⌒</div>
+        <div class="clawHead">
+          <div class="clawJoint"></div>
+          <div class="clawArm left"></div>
+          <div class="clawArm right"></div>
+        </div>
       </div>
 
-      <div class="prize" id="prize">
-        <img id="prizeImg" src="IMG_9260.png" alt="景品">
-      </div>
+      <div class="prizeArea" id="prizeArea"></div>
 
       <div class="floor"></div>
     </div>
@@ -295,8 +350,7 @@
 
   <script>
     const claw = document.getElementById("claw");
-    const prize = document.getElementById("prize");
-    const prizeImg = document.getElementById("prizeImg");
+    const prizeArea = document.getElementById("prizeArea");
     const startBtn = document.getElementById("startBtn");
     const catchBtn = document.getElementById("catchBtn");
     const message = document.getElementById("message");
@@ -316,8 +370,9 @@
     let moving = false;
     let timer = null;
     let nextPlayGuaranteed = false;
+    let currentTargetPrize = null;
 
-    const normalSuccessRate = 0.8;
+    const normalSuccessRate = 0.25;
     const specialEventRateWhenFailed = 0.5;
 
     const specialMessages = [
@@ -339,20 +394,41 @@
       }
     ];
 
-    function resetGame() {
-      const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
-      prizeImg.src = randomPrize;
+    function makePrizeField() {
+      prizeArea.innerHTML = "";
 
+      const positions = [
+        { left: 42, top: 160 },
+        { left: 150, top: 145 },
+        { left: 255, top: 165 },
+        { left: 92, top: 75 },
+        { left: 210, top: 70 }
+      ];
+
+      positions.forEach((pos, index) => {
+        const img = document.createElement("img");
+        img.className = "prizeItem";
+        img.src = prizes[index % prizes.length];
+        img.alt = "景品";
+        img.style.left = pos.left + "px";
+        img.style.top = pos.top + "px";
+        img.dataset.baseLeft = pos.left;
+        img.dataset.baseTop = pos.top;
+        prizeArea.appendChild(img);
+      });
+    }
+
+    function resetGame() {
       clawX = 160;
       direction = 1;
       moving = false;
+      currentTargetPrize = null;
 
+      claw.classList.remove("grabbing");
       claw.style.left = clawX + "px";
       claw.style.top = "72px";
 
-      prize.style.left = "150px";
-      prize.style.bottom = "66px";
-      prize.style.transform = "scale(1)";
+      makePrizeField();
 
       message.textContent = nextPlayGuaranteed
         ? "次は特別チャンス♡"
@@ -366,6 +442,29 @@
       if (clawX < 10) direction = 1;
 
       claw.style.left = clawX + "px";
+    }
+
+    function findNearestPrize() {
+      const items = [...document.querySelectorAll(".prizeItem")];
+
+      let nearest = null;
+      let nearestDistance = Infinity;
+
+      items.forEach(item => {
+        const itemCenterX = item.offsetLeft + item.offsetWidth / 2;
+        const clawCenterX = clawX + claw.offsetWidth / 2;
+        const distance = Math.abs(clawCenterX - itemCenterX);
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearest = item;
+        }
+      });
+
+      return {
+        prize: nearest,
+        distance: nearestDistance
+      };
     }
 
     startBtn.addEventListener("click", () => {
@@ -387,40 +486,89 @@
       catchBtn.disabled = true;
       message.textContent = "アーム下降中...";
 
-      claw.style.top = "270px";
+      const result = findNearestPrize();
+      currentTargetPrize = result.prize;
 
-      setTimeout(judgeCatch, 850);
+      claw.style.top = "245px";
+
+      setTimeout(() => {
+        claw.classList.add("grabbing");
+        message.textContent = "つかんだかも...！";
+      }, 700);
+
+      setTimeout(judgeCatch, 1250);
     });
 
     function judgeCatch() {
-      const prizeX = prize.offsetLeft;
-      const distance = Math.abs(clawX - prizeX);
-      const isGoodPosition = distance < 55;
+      const result = findNearestPrize();
+      const isGoodPosition = result.distance < 68;
+
+      if (!currentTargetPrize) {
+        failCatch();
+        return;
+      }
 
       if (nextPlayGuaranteed) {
         nextPlayGuaranteed = false;
-        successCatch("蓮くんが取ってくれたよ♡");
+        liftPrize(true, "蓮くんが取ってくれたよ♡");
         return;
       }
 
       const isLucky = Math.random() < normalSuccessRate;
 
       if (isGoodPosition && isLucky) {
-        successCatch("GET！景品を取れたよ♡");
+        liftPrize(true, "GET！景品を取れたよ♡");
+      } else if (isGoodPosition) {
+        liftPrize(false, "あっ、落ちちゃった...！");
       } else {
-        failCatch();
+        missPrize();
       }
     }
 
-    function successCatch(text) {
-      message.textContent = text;
-      prize.style.bottom = "230px";
-      prize.style.transform = "scale(1.12)";
+    function liftPrize(success, text) {
+      const clawLeft = clawX + claw.offsetWidth / 2 - currentTargetPrize.offsetWidth / 2;
+
+      currentTargetPrize.classList.add("caught");
+      currentTargetPrize.style.left = clawLeft + "px";
+      currentTargetPrize.style.top = "150px";
+
+      message.textContent = "持ち上げ中...！";
 
       setTimeout(() => {
         claw.style.top = "72px";
-        startBtn.disabled = false;
-      }, 900);
+        currentTargetPrize.style.top = "35px";
+      }, 500);
+
+      if (success) {
+        setTimeout(() => {
+          message.textContent = text;
+          currentTargetPrize.style.transform = "scale(1.18)";
+          startBtn.disabled = false;
+        }, 1300);
+      } else {
+        setTimeout(() => {
+          currentTargetPrize.classList.add("drop");
+          currentTargetPrize.style.top = currentTargetPrize.dataset.baseTop + "px";
+          currentTargetPrize.style.left = currentTargetPrize.dataset.baseLeft + "px";
+          message.textContent = text;
+        }, 1300);
+
+        setTimeout(() => {
+          claw.classList.remove("grabbing");
+          failCatch();
+        }, 1900);
+      }
+    }
+
+    function missPrize() {
+      message.textContent = "空振りしちゃった...！";
+
+      setTimeout(() => {
+        claw.classList.remove("grabbing");
+        claw.style.top = "72px";
+      }, 700);
+
+      setTimeout(failCatch, 1200);
     }
 
     function failCatch() {
@@ -433,6 +581,7 @@
         message.textContent = "惜しい！もう一回チャレンジ♡";
 
         setTimeout(() => {
+          claw.classList.remove("grabbing");
           claw.style.top = "72px";
           startBtn.disabled = false;
         }, 900);
@@ -452,9 +601,12 @@
     closeEventBtn.addEventListener("click", () => {
       otomeOverlay.style.display = "none";
       message.textContent = "次回は確定GETチャンス♡";
+      claw.classList.remove("grabbing");
       claw.style.top = "72px";
       startBtn.disabled = false;
     });
+
+    makePrizeField();
   </script>
 </body>
 </html>
